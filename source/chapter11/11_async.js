@@ -45,6 +45,7 @@ class Network {
     this.types = Object.create(null)
   }
 
+  // name: string , handler: function (nest: string, content: string, source: string, callback: function(error, response))
   defineRequestType(name, handler) {
     this.types[name] = handler
   }
@@ -107,14 +108,11 @@ let defineRequestType = network1.defineRequestType.bind(network1)
 
 
 /*------------------------------------------------------------*/
-// var bigOak = require("./crow-tech").bigOak;
 
-// var defineRequestType = require("./crow-tech").defineRequestType;
-
-defineRequestType("note", (nest, content, source, done) => {
-  console.log(`${nest.name} received note: ${content}`);
-  done();
-});
+// defineRequestType("note", (nest, content, source, done) => {
+//   console.log(`${nest.name} received note: ${content}`);
+//   done();
+// });
 function storage(nest, name) {
   return new Promise(resolve => {
     nest.readStorage(name, result => resolve(result));
@@ -156,6 +154,11 @@ function requestType(name, handler) {
 }
 
 requestType("ping", () => "pong");
+
+requestType("note", (nest, content, source) => {
+  console.log(`${nest.name} received note: ${content}`);
+  return "nota enviada";
+})
 
 function availableNeighbors(nest) {
   let requests = nest.neighbors.map(neighbor => {
@@ -293,9 +296,73 @@ async function chicks(nest, year) {
   return list;
 }
 /*------------------------------------------------------------*/
-bigOak.readStorage("food caches", caches => {
-  let firstCache = caches[0];
-  bigOak.readStorage(firstCache, info => {
-    console.log(info);
-  });
-});
+/*
+// bigOak.readStorage("food caches", caches => {
+//   let firstCache = caches[0];
+//   bigOak.readStorage(firstCache, info => {
+//     console.log(info);
+//   });
+// });
+//
+// bigOak.send("Cow Pasture", "note", "Let's caw loudly at 7PM",
+//             () => console.log("Note delivered."));
+// request(bigOak,"Cow Pasture", "ping").then(v => console.log(v))
+storage(bigOak, "enemies")
+  .then(value => console.log("Got", value));
+
+// storage(bigOak, "food caches")
+//   .then(function(caches){
+//     storage(bigOak, caches[0])
+//       .then(function(info){
+//         console.log('nested promise: ',info);
+//       })
+//   })
+
+// pCaches = storage(bigOak, "food caches")
+// pFirstCache = pCaches.then(function(dataCaches){
+//   return storage(bigOak, dataCaches[0])
+// })
+// pFirstCache.then(function(info){
+//   console.log('unnested promises: ',info);
+// })
+//
+// p1 = new Promise((resolve, reject) => {
+//   let x;
+//   if ((x =Math.random()) > 0.3){
+//     resolve(x)
+//   }else {
+//     reject(new Error("Fail "+x))
+//   }
+// })
+// // new Promise((resolve, reject) => resolve(2))
+// .then(value => console.log("Handler 1 "+ value))
+// .catch(reason => {
+//   console.log("Caught failure " + reason);
+//   return "nothing";
+// });
+// p2 = p1.then(value => console.log("Handler 2", value));
+// p2.then(value => console.log("Handler 3", value));
+// → Caught failure Error: Fail
+// → Handler 2 nothing
+// var resolvedProm = Promise.resolve(33);
+//
+// var thenProm = resolvedProm.then(function(value){
+//     console.log("this gets called after the end of the main stack. the value received and returned is: " + value);
+//     return value;
+// });
+// // instantly logging the value of thenProm
+// console.log(thenProm);
+//
+// // using setTimeout we can postpone the execution of a function to the moment the stack is empty
+// setTimeout(function(){
+//     console.log(thenProm);
+// });
+
+*/
+bigOak.send("Cow Pasture", "note", "Let's caw loudly at 7PM",
+            (_,v) => console.log("Note delivered." + v  ));
+
+request(bigOak,"Cow Pasture", "note", "holaaa")
+.then(v => {
+  console.log(v)
+})
